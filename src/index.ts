@@ -24,7 +24,10 @@ export default {
         return json({
           Status: 'Online',
           Service: 'Knowledge is free, so does AI',
-          Timestamp: new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()),
+          Timestamp: new Intl.DateTimeFormat('en-US', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(new Date()),
         });
       }
 
