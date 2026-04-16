@@ -22,9 +22,9 @@ export default {
       // Health check — no auth required
       if ((path === '/health' || path === '/') && request.method === 'GET') {
         return json({
-          status: 'ok',
-          service: 'ai-worker-proxy',
-          timestamp: new Date().toISOString(),
+          Status: 'Online',
+          Service: 'Knowledge is free, so does AI',
+          Timestamp: new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()),
         });
       }
 
