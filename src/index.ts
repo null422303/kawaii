@@ -14,49 +14,254 @@ const CORS_HEADERS: Record<string, string> = {
 // apiKeys as string (no brackets)
 // ─────────────────────────────────────────────────────────────
 const HARDCODED_ROUTES_CONFIG = {
-  "super-router": [
-    { "provider": "openai", "model": "gemini-3.1-pro", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-5.4", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "claude-sonnet-4-6", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "claude-opus-4-6", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "claude-opus-4-6-experimental-thinking", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "opus-experimental", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "sonnet-experimental", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "haiku-experimental", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gemma-4-26b", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gemma-4-31b-it", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "o3-mini", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "o3-mini-high", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "o4-mini", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "o4-mini-high", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-4.1", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-4.1-mini", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-4.1-nano", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-4.1-codex", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-5.2", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-5.2-mini", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-5.2-codex", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-6", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-6-mini", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-4", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-4-turbo", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-4o", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-4o-mini", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-oss-120b", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "gpt-oss-20b", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "minimax-m2.7", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "GLM-5.1-FP8", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "deepseek-v3.2", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "deepseek-v3.2-thinking", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "qwen3.6-plus", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "qwen3.6-plus-search", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "qwen3.5-plus-search", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "glm5-think", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "qwen-image", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "qwen-image-edit", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "qwen-video", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" },
-    { "provider": "openai", "model": "qwen-video-alt", "apiKeys": "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F", "baseUrl": "http://20.199.80.17:24668/v1" }
-  ]
+  'super-router': [
+    {
+      provider: 'openai',
+      model: 'gemini-3.1-pro',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-5.4',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'claude-sonnet-4-6',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'claude-opus-4-6',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'claude-opus-4-6-experimental-thinking',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'opus-experimental',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'sonnet-experimental',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'haiku-experimental',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gemma-4-26b',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gemma-4-31b-it',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'o3-mini',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'o3-mini-high',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'o4-mini',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'o4-mini-high',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-4.1',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-4.1-mini',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-4.1-nano',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-4.1-codex',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-5.2',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-5.2-mini',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-5.2-codex',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-6',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-6-mini',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-4',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-4-turbo',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-4o',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-4o-mini',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-oss-120b',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'gpt-oss-20b',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'minimax-m2.7',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'GLM-5.1-FP8',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'deepseek-v3.2',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'deepseek-v3.2-thinking',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'qwen3.6-plus',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'qwen3.6-plus-search',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'qwen3.5-plus-search',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'glm5-think',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'qwen-image',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'qwen-image-edit',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'qwen-video',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+    {
+      provider: 'openai',
+      model: 'qwen-video-alt',
+      apiKeys: 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F',
+      baseUrl: 'http://20.199.80.17:24668/v1',
+    },
+  ],
 };
 // ─────────────────────────────────────────────────────────────
 
@@ -78,22 +283,25 @@ export default {
         return json({
           Status: 'Online',
           Service: 'Knowledge is free, so does AI',
-          Timestamp: new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()),
+          Timestamp: new Intl.DateTimeFormat('en-US', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(new Date()),
         });
       }
 
       // ====================== MODELS LIST (FIXED) ======================
       if ((path === '/models' || path === '/v1/models') && request.method === 'GET') {
-        const modelsList = HARDCODED_ROUTES_CONFIG["super-router"].map((item: any) => ({
+        const modelsList = HARDCODED_ROUTES_CONFIG['super-router'].map((item: any) => ({
           id: item.model,
-          object: "model",
-          owned_by: "custom",           // you can change to "openai", "anthropic", etc. if you want
-          permission: []
+          object: 'model',
+          owned_by: 'custom', // you can change to "openai", "anthropic", etc. if you want
+          permission: [],
         }));
 
         return json({
-          object: "list",
-          data: modelsList
+          object: 'list',
+          data: modelsList,
         });
       }
 
