@@ -31,9 +31,12 @@ export default {
         });
       }
 
+      // Initialize router (loads config from KV or env)
+      const router = new Router(env);
+      await router.initialize();
+
       // Models list — no auth required (matches OpenAI behavior)
       if ((path === '/models' || path === '/v1/models') && request.method === 'GET') {
-        const router = new Router(env);
         return json({
           object: 'list',
           data: router.getAvailableModels(),
@@ -50,7 +53,7 @@ export default {
         request.method === 'POST' &&
         (path === '/' || path === '/v1/chat/completions' || path === '/chat/completions')
       ) {
-        return handleChatCompletion(request, env);
+        return handleChatCompletion(request, env, router);
       }
 
       throw new ProxyError('Not found', 404);
@@ -66,7 +69,7 @@ export default {
   },
 };
 
-async function handleChatCompletion(request: Request, env: Env): Promise<Response> {
+async function handleChatCompletion(request: Request, env: Env, router: Router): Promise<Response> {
   const body = await request.json();
   const chatRequest = body as OpenAIChatRequest;
 
@@ -79,7 +82,6 @@ async function handleChatCompletion(request: Request, env: Env): Promise<Respons
 
   console.log(`[Worker] model=${chatRequest.model} stream=${chatRequest.stream || false}`);
 
-  const router = new Router(env);
   const response = await router.executeWithFallback(chatRequest);
 
   if (!response.success) {
