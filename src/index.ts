@@ -27,7 +27,7 @@ export default {
           Timestamp: new Intl.DateTimeFormat('en-US', {
             dateStyle: 'medium',
             timeStyle: 'short',
-          }).format(new Date()),
+          }).format(new Date()) 'UTC',
         });
       }
 
