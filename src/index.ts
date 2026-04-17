@@ -1,5 +1,4 @@
 import { Env, OpenAIChatRequest } from './types';
-import { Router } from './router';
 import { ProxyError, createErrorResponse } from './utils/error-handler';
 
 const CORS_HEADERS: Record<string, string> = {
@@ -9,7 +8,7 @@ const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Max-Age': '86400',
 };
 
-// All models list (same as your backend)
+// All real models from your backend
 const MODELS = [
   "gemini-3.1-pro", "gpt-5.4", "claude-sonnet-4-6", "claude-opus-4-6",
   "claude-opus-4-6-experimental-thinking", "opus-experimental", "sonnet-experimental",
@@ -22,7 +21,7 @@ const MODELS = [
   "qwen-image", "qwen-image-edit", "qwen-video", "qwen-video-alt"
 ];
 
-// Backend configuration
+// Backend settings
 const BACKEND_URL = "http://20.199.80.17:24668/v1";
 const BACKEND_API_KEY = "sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F";
 
@@ -38,10 +37,14 @@ export default {
 
       // Health check
       if ((path === '/health' || path === '/') && request.method === 'GET') {
-        return json({ Status: 'Online', Service: 'Knowledge is free, so does AI', Timestamp: new Date().toISOString() });
+        return json({ 
+          Status: 'Online', 
+          Service: 'Knowledge is free, so does AI', 
+          Timestamp: new Date().toISOString() 
+        });
       }
 
-      // Return full models list
+      // Return all real models
       if ((path === '/models' || path === '/v1/models') && request.method === 'GET') {
         const data = MODELS.map(model => ({
           id: model,
@@ -53,28 +56,27 @@ export default {
         return json({ object: "list", data });
       }
 
-      // Auth (you can disable later if you want)
+      // Auth check
       if (!verifyAuth(request, env)) {
         throw new ProxyError('Unauthorized', 401, 'invalid_auth');
       }
 
-      // Chat Completions - Forward directly to your backend with same model name
+      // Forward chat completions directly to your backend (same model name)
       if (request.method === 'POST' && 
           (path === '/v1/chat/completions' || path === '/chat/completions' || path === '/')) {
         
         const body = await request.json() as OpenAIChatRequest;
-        
-        // Forward request to your real backend with original model name
+
         const forwardResponse = await fetch(`${BACKEND_URL}/chat/completions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${BACKEND_API_KEY}`,
           },
-          body: JSON.stringify(body),   // Send original body (same model name)
+          body: JSON.stringify(body),
         });
 
-        // Return the response as-is (including streaming)
+        // Handle streaming response
         if (forwardResponse.headers.get('content-type')?.includes('text/event-stream')) {
           return new Response(forwardResponse.body, {
             headers: {
