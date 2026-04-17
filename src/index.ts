@@ -8,54 +8,10 @@ const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Max-Age': '86400',
 };
 
-// All real models from your backend
-const MODELS = [
-  'gemini-3.1-pro',
-  'gpt-5.4',
-  'claude-sonnet-4-6',
-  'claude-opus-4-6',
-  'claude-opus-4-6-experimental-thinking',
-  'opus-experimental',
-  'sonnet-experimental',
-  'haiku-experimental',
-  'gemma-4-26b',
-  'gemma-4-31b-it',
-  'o3-mini',
-  'o3-mini-high',
-  'o4-mini',
-  'o4-mini-high',
-  'gpt-4.1',
-  'gpt-4.1-mini',
-  'gpt-4.1-nano',
-  'gpt-4.1-codex',
-  'gpt-5.2',
-  'gpt-5.2-mini',
-  'gpt-5.2-codex',
-  'gpt-6',
-  'gpt-6-mini',
-  'gpt-4',
-  'gpt-4-turbo',
-  'gpt-4o',
-  'gpt-4o-mini',
-  'gpt-oss-120b',
-  'gpt-oss-20b',
-  'minimax-m2.7',
-  'GLM-5.1-FP8',
-  'deepseek-v3.2',
-  'deepseek-v3.2-thinking',
-  'qwen3.6-plus',
-  'qwen3.6-plus-search',
-  'qwen3.5-plus-search',
-  'glm5-think',
-  'qwen-image',
-  'qwen-image-edit',
-  'qwen-video',
-  'qwen-video-alt',
-];
-
-// Backend settings
+// ================== YOUR BACKEND ==================
 const BACKEND_URL = 'http://20.199.80.17:24668/v1';
 const BACKEND_API_KEY = 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F';
+// ===================================================
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -67,40 +23,40 @@ export default {
       const url = new URL(request.url);
       const path = url.pathname;
 
-      // Health check
+      // ====================== HEALTH CHECK ======================
       if ((path === '/health' || path === '/') && request.method === 'GET') {
         return json({
           Status: 'Online',
           Service: 'Knowledge is free, so does AI',
-          Timestamp: new Date().toISOString(),
+          Timestamp: new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()),
         });
       }
 
-      // Return all real models
+      // ====================== MODELS LIST (transparent) ======================
       if ((path === '/models' || path === '/v1/models') && request.method === 'GET') {
-        const data = MODELS.map((model) => ({
-          id: model,
-          object: 'model',
-          owned_by: 'custom',
-          permission: [],
-        }));
-
-        return json({ object: 'list', data });
+        const resp = await fetch(`${BACKEND_URL}/models`, {
+          headers: { Authorization: `Bearer ${BACKEND_API_KEY}` },
+        });
+        const data = await resp.json();
+        return new Response(JSON.stringify(data), {
+          status: resp.status,
+          headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+        });
       }
 
-      // Auth check
+      // ====================== AUTH CHECK ======================
       if (!verifyAuth(request, env)) {
         throw new ProxyError('Unauthorized', 401, 'invalid_auth');
       }
 
-      // Forward chat completions directly to your backend (same model name)
+      // ====================== CHAT COMPLETIONS (transparent forward) ======================
       if (
         request.method === 'POST' &&
-        (path === '/v1/chat/completions' || path === '/chat/completions' || path === '/')
+        (path === '/' || path === '/v1/chat/completions' || path === '/chat/completions')
       ) {
-        const body = (await request.json()) as OpenAIChatRequest;
+        const body = await request.json();
 
-        const forwardResponse = await fetch(`${BACKEND_URL}/chat/completions`, {
+        const backendResponse = await fetch(`${BACKEND_URL}/chat/completions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -109,20 +65,15 @@ export default {
           body: JSON.stringify(body),
         });
 
-        // Handle streaming response
-        if (forwardResponse.headers.get('content-type')?.includes('text/event-stream')) {
-          return new Response(forwardResponse.body, {
-            headers: {
-              'Content-Type': 'text/event-stream',
-              'Cache-Control': 'no-cache',
-              Connection: 'keep-alive',
-              ...CORS_HEADERS,
-            },
-          });
-        }
+        const responseBody = await backendResponse.text();
 
-        const result = await forwardResponse.json();
-        return json(result, forwardResponse.status);
+        return new Response(responseBody, {
+          status: backendResponse.status,
+          headers: {
+            'Content-Type': backendResponse.headers.get('Content-Type') || 'application/json',
+            ...CORS_HEADERS,
+          },
+        });
       }
 
       throw new ProxyError('Not found', 404);
@@ -130,11 +81,10 @@ export default {
       console.error('[Worker] Error:', error);
       const errorResponse = createErrorResponse(error);
       const headers = new Headers(errorResponse.headers);
-      Object.entries(CORS_HEADERS).forEach(([k, v]) => headers.set(k, v));
-      return new Response(errorResponse.body, {
-        status: errorResponse.status,
-        headers,
-      });
+      for (const [key, value] of Object.entries(CORS_HEADERS)) {
+        headers.set(key, value);
+      }
+      return new Response(errorResponse.body, { status: errorResponse.status, headers });
     }
   },
 };
