@@ -1,4 +1,4 @@
-import { Env, OpenAIChatRequest } from './types';
+import { Env } from './types';
 import { ProxyError, createErrorResponse } from './utils/error-handler';
 
 const CORS_HEADERS: Record<string, string> = {
@@ -8,10 +8,10 @@ const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Max-Age': '86400',
 };
 
-// ================== YOUR BACKEND ==================
+// ================== YOUR BACKEND CONFIG ==================
 const BACKEND_URL = 'http://20.199.80.17:24668/v1';
 const BACKEND_API_KEY = 'sk-aa1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F';
-// ===================================================
+// ========================================================
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -23,7 +23,7 @@ export default {
       const url = new URL(request.url);
       const path = url.pathname;
 
-      // ====================== HEALTH CHECK ======================
+      // Health Check
       if ((path === '/health' || path === '/') && request.method === 'GET') {
         return json({
           Status: 'Online',
@@ -32,11 +32,12 @@ export default {
         });
       }
 
-      // ====================== MODELS LIST (transparent) ======================
+      // Transparent /v1/models - returns exactly what your backend returns
       if ((path === '/models' || path === '/v1/models') && request.method === 'GET') {
         const resp = await fetch(`${BACKEND_URL}/models`, {
           headers: { Authorization: `Bearer ${BACKEND_API_KEY}` },
         });
+
         const data = await resp.json();
         return new Response(JSON.stringify(data), {
           status: resp.status,
@@ -44,12 +45,12 @@ export default {
         });
       }
 
-      // ====================== AUTH CHECK ======================
+      // Auth check for chat completions
       if (!verifyAuth(request, env)) {
         throw new ProxyError('Unauthorized', 401, 'invalid_auth');
       }
 
-      // ====================== CHAT COMPLETIONS (transparent forward) ======================
+      // Transparent forward for chat completions
       if (
         request.method === 'POST' &&
         (path === '/' || path === '/v1/chat/completions' || path === '/chat/completions')
