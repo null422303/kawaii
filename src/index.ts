@@ -1,116 +1,66 @@
-import { Env, OpenAIChatRequest } from './types';
-import { Router } from './router';
-import { ProxyError, createErrorResponse } from './utils/error-handler';
+// src/index.ts
 
-const CORS_HEADERS: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Max-Age': '86400',
+// Import necessary modules
+y import express from 'express';
+import { Router } from 'express';
+
+// Define the backend configuration interface
+interface BackendConfig {
+    url: string;
+    apiKey: string;
+}
+
+// Define a map to hold multiple backend providers configurations
+const backends: { [key: string]: BackendConfig } = {
+    default: { url: 'https://default.backend.url', apiKey: 'DEFAULT_API_KEY' },
+    // You can add more backends here
 };
 
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: CORS_HEADERS });
+// Function to add a new backend provider
+function addBackend(name: string, url: string, apiKey: string) {
+    backends[name] = { url, apiKey };
+}
+
+// Create an Express app and Router
+const app = express();
+const router = Router();
+
+// Middleware to handle requests to the backends
+router.use((req, res, next) => {
+    const backendName = req.headers['x-backend'] || 'default'; // Default to 'default' backend
+    const backend = backends[backendName];
+
+    if (!backend) {
+        return res.status(404).send('Backend not found');
     }
 
-    try {
-      const url = new URL(request.url);
-      const path = url.pathname;
+    // Set backend URL and API key (for demonstration purposes) in the request
+    req.backendUrl = backend.url;
+    req.backendApiKey = backend.apiKey;
 
-      // Health check — no auth required
-      if ((path === '/health' || path === '/') && request.method === 'GET') {
-        return json({
-          Status: 'Online',
-          Service: 'Knowledge is free, so does AI',
-          Timestamp: new Intl.DateTimeFormat('en-US', {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-          }).format(new Date()),' UTC',
-        });
-      }
+    next(); // Proceed to the next middleware or route handler
+});
 
-      // Models list — no auth required (matches OpenAI behavior)
-      if ((path === '/models' || path === '/v1/models') && request.method === 'GET') {
-        const router = new Router(env);
-        return json({
-          object: 'list',
-          data: router.getAvailableModels(),
-        });
-      }
+// Example route
+router.get('/data', async (req, res) => {
+    const { backendUrl, backendApiKey } = req;
+    // Logic to fetch data from the backend using the backendUrl and backendApiKey
+    res.json({ message: `Fetching data from ${backendUrl} with API key ${backendApiKey}` });
+});
 
-      // Everything below requires auth
-      if (!verifyAuth(request, env)) {
-        throw new ProxyError('Unauthorized', 401, 'invalid_auth');
-      }
+// Use the router in the app
+app.use('/api', router);
 
-      // Chat completions — POST only
-      if (
-        request.method === 'POST' &&
-        (path === '/' || path === '/v1/chat/completions' || path === '/chat/completions')
-      ) {
-        return handleChatCompletion(request, env);
-      }
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
-      throw new ProxyError('Not found', 404);
-    } catch (error) {
-      console.error('[Worker] Error:', error);
-      const errorResponse = createErrorResponse(error);
-      const headers = new Headers(errorResponse.headers);
-      for (const [key, value] of Object.entries(CORS_HEADERS)) {
-        headers.set(key, value);
-      }
-      return new Response(errorResponse.body, { status: errorResponse.status, headers });
-    }
-  },
-};
-
-async function handleChatCompletion(request: Request, env: Env): Promise<Response> {
-  const body = await request.json();
-  const chatRequest = body as OpenAIChatRequest;
-
-  if (!chatRequest.messages || !Array.isArray(chatRequest.messages)) {
-    throw new ProxyError('Invalid request: messages array is required', 400);
-  }
-  if (!chatRequest.model) {
-    throw new ProxyError('Invalid request: model is required', 400);
-  }
-
-  console.log(`[Worker] model=${chatRequest.model} stream=${chatRequest.stream || false}`);
-
-  const router = new Router(env);
-  const response = await router.executeWithFallback(chatRequest);
-
-  if (!response.success) {
-    throw new ProxyError(response.error || 'All providers failed', response.statusCode || 500);
-  }
-
-  if (response.stream) {
-    return new Response(response.stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-        ...CORS_HEADERS,
-      },
-    });
-  }
-
-  return json(response.response);
+// Function to update backend configurations from an external source, if needed
+function updateBackendConfig(externalConfig: { [key: string]: BackendConfig }) {
+    Object.assign(backends, externalConfig);
 }
 
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
-  });
-}
-
-function verifyAuth(request: Request, env: Env): boolean {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader) return false;
-
-  const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
-  return token === env.PROXY_AUTH_TOKEN;
-}
+// Exporting functions for external use
+export { addBackend, updateBackendConfig };
