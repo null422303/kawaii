@@ -61,7 +61,7 @@ export interface OpenAIChatResponse {
     index: number;
     message: OpenAIMessage;
     finish_reason: 'stop' | 'length' | 'tool_calls' | 'content_filter' | null;
-  }>; 
+  }>;
   usage?: {
     prompt_tokens: number;
     completion_tokens: number;
@@ -82,7 +82,7 @@ export interface OpenAIStreamChunk {
       tool_calls?: StreamToolCallDelta[];
     };
     finish_reason: 'stop' | 'length' | 'tool_calls' | 'content_filter' | null;
-  }>; 
+  }>;
 }
 
 // Provider configuration

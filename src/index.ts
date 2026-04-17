@@ -95,11 +95,7 @@ export default {
 
 // ─── Chat completions ────────────────────────────────────────────────────────
 
-async function handleChatCompletion(
-  request: Request,
-  env: Env,
-  router: Router
-): Promise<Response> {
+async function handleChatCompletion(request: Request, env: Env, router: Router): Promise<Response> {
   const body = await request.json();
   const chatRequest = body as OpenAIChatRequest;
 
@@ -135,7 +131,10 @@ async function handleChatCompletion(
 // ─── Admin route handlers ────────────────────────────────────────────────────
 
 async function handleAddRoute(request: Request, router: Router): Promise<Response> {
-  const body = (await request.json()) as { model: string; providers: AdminRouteRequest['providers'] };
+  const body = (await request.json()) as {
+    model: string;
+    providers: AdminRouteRequest['providers'];
+  };
 
   if (!body.model || typeof body.model !== 'string') {
     throw new ProxyError('Invalid request: "model" (string) is required', 400);
