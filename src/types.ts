@@ -99,11 +99,17 @@ export interface RouteConfig {
   [route: string]: ProviderConfig[];
 }
 
+// Admin API request for adding/updating a route
+export interface AdminRouteRequest {
+  providers: ProviderConfig[];
+}
+
 // Environment bindings
 export interface Env {
   AI?: any;
   KAWAI_KV: KVNamespace;
   PROXY_AUTH_TOKEN: string;
+  /** @deprecated Fallback only — use KV storage instead */
   ROUTES_CONFIG?: string;
   [key: string]: any;
 }

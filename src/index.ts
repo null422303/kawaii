@@ -1,10 +1,10 @@
-import { Env, OpenAIChatRequest } from './types';
+import { Env, OpenAIChatRequest, AdminRouteRequest } from './types';
 import { Router } from './router';
 import { ProxyError, createErrorResponse } from './utils/error-handler';
 
 const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Max-Age': '86400',
 };
@@ -48,7 +48,31 @@ export default {
         throw new ProxyError('Unauthorized', 401, 'invalid_auth');
       }
 
-      // Chat completions — POST only
+      // ── Admin API: manage routes via KV ──────────────────────────────────
+      if (path === '/v1/admin/routes' || path === '/admin/routes') {
+        switch (request.method) {
+          // GET — list all routes
+          case 'GET':
+            return json(router.getAllRoutes());
+
+          // POST — add a new route (body: { "model": "my-model", "providers": [...] })
+          case 'POST':
+            return await handleAddRoute(request, router);
+
+          // PUT — replace entire routes config (body: RouteConfig JSON)
+          case 'PUT':
+            return await handleSetAllRoutes(request, router);
+
+          // DELETE — delete a route (?model=my-model)
+          case 'DELETE':
+            return await handleDeleteRoute(url, router);
+
+          default:
+            throw new ProxyError('Method not allowed', 405);
+        }
+      }
+
+      // ── Chat completions ─────────────────────────────────────────────────
       if (
         request.method === 'POST' &&
         (path === '/' || path === '/v1/chat/completions' || path === '/chat/completions')
@@ -69,7 +93,13 @@ export default {
   },
 };
 
-async function handleChatCompletion(request: Request, env: Env, router: Router): Promise<Response> {
+// ─── Chat completions ────────────────────────────────────────────────────────
+
+async function handleChatCompletion(
+  request: Request,
+  env: Env,
+  router: Router
+): Promise<Response> {
   const body = await request.json();
   const chatRequest = body as OpenAIChatRequest;
 
@@ -101,6 +131,50 @@ async function handleChatCompletion(request: Request, env: Env, router: Router):
 
   return json(response.response);
 }
+
+// ─── Admin route handlers ────────────────────────────────────────────────────
+
+async function handleAddRoute(request: Request, router: Router): Promise<Response> {
+  const body = (await request.json()) as { model: string; providers: AdminRouteRequest['providers'] };
+
+  if (!body.model || typeof body.model !== 'string') {
+    throw new ProxyError('Invalid request: "model" (string) is required', 400);
+  }
+  if (!body.providers || !Array.isArray(body.providers) || body.providers.length === 0) {
+    throw new ProxyError('Invalid request: "providers" (non-empty array) is required', 400);
+  }
+
+  await router.setRoute(body.model, body.providers);
+  return json({ message: `Route "${body.model}" saved`, model: body.model }, 201);
+}
+
+async function handleSetAllRoutes(request: Request, router: Router): Promise<Response> {
+  const body = (await request.json()) as Record<string, any>;
+
+  if (typeof body !== 'object' || Array.isArray(body)) {
+    throw new ProxyError('Invalid request: body must be a routes config object', 400);
+  }
+
+  await router.setAllRoutes(body);
+  return json({ message: 'All routes updated', models: Object.keys(body) });
+}
+
+async function handleDeleteRoute(url: URL, router: Router): Promise<Response> {
+  const model = url.searchParams.get('model');
+
+  if (!model) {
+    throw new ProxyError('Query parameter "model" is required (e.g. ?model=my-model)', 400);
+  }
+
+  const deleted = await router.deleteRoute(model);
+  if (!deleted) {
+    throw new ProxyError(`Route "${model}" not found`, 404);
+  }
+
+  return json({ message: `Route "${model}" deleted`, model });
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {

@@ -74,22 +74,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Replace ROUTES_CONFIG in wrangler.toml
-        env:
-          ROUTES_CONFIG: ${{ vars.ROUTES_CONFIG }}
-        run: |
-          # Remove existing [vars] section and everything after it
-          sed -i '/^\[vars\]/,$d' wrangler.toml
-
-          # Add new [vars] section with GitHub Variable
-          cat >> wrangler.toml << EOF
-
-          [vars]
-          ROUTES_CONFIG = '''${ROUTES_CONFIG}'''
-          EOF
-
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Upload routes config to KV
+        if: vars.ROUTES_CONFIG != ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
+          ROUTES_CONFIG: ${{ vars.ROUTES_CONFIG }}
+        run: |
+          # Write config to temp file and upload to KV
+          echo "$ROUTES_CONFIG" > /tmp/routes-config.json
+          npx wrangler kv:key put --namespace-id="$KV_NAMESPACE_ID" "routes-config" --path=/tmp/routes-config.json

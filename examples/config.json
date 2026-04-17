@@ -1,0 +1,32 @@
+{
+  "deep-think": [
+    {
+      "provider": "anthropic",
+      "model": "claude-opus-4-20250514",
+      "apiKeys": ["ANTHROPIC_KEY_1"]
+    }
+  ],
+  "fast": [
+    {
+      "provider": "google",
+      "model": "gemini-2.0-flash",
+      "apiKeys": ["GOOGLE_KEY_1"]
+    }
+  ],
+  "nvidia": [
+    {
+      "provider": "openai-compatible",
+      "baseUrl": "https://integrate.api.nvidia.com/v1",
+      "model": "nvidia/llama-3.1-nemotron-70b-instruct",
+      "apiKeys": ["NVIDIA_KEY_1"]
+    }
+  ],
+  "search": [
+    {
+      "provider": "google",
+      "model": "gemini-3-flash-preview",
+      "apiKeys": ["GOOGLE_KEY_1"],
+      "grounding": true
+    }
+  ]
+}

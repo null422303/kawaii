@@ -6,6 +6,13 @@ compatibility_date = "2026-04-16"
 [ai]
 binding = "AI"
 
+# Cloudflare KV — routes are stored here instead of env vars
+# Run `wrangler kv:namespace create "kawai-kv"` and replace the IDs below
+[[kv_namespaces]]
+binding = "KAWAI_KV"
+id = "YOUR_KV_NAMESPACE_ID"
+preview_id = "YOUR_KV_PREVIEW_NAMESPACE_ID"
+
 # Cloudflare dashboard logs (optional)
 [observability]
 [observability.logs]
@@ -14,54 +21,17 @@ head_sampling_rate = 1
 invocation_logs = true
 persist = false
 
-# ====================================================================================
-# EXAMPLE CONFIGURATION
-# ====================================================================================
-# This [vars] section contains example configuration.
-# GitHub Actions will REPLACE it with real ROUTES_CONFIG from GitHub Variable.
-# Secrets (PROXY_AUTH_TOKEN, API keys) are set in Cloudflare Dashboard manually.
-# ====================================================================================
-
-[vars]
-# Model routing configuration (example - will be replaced by GitHub Actions)
-ROUTES_CONFIG = '''
-{
-  "deep-think": [
-    {
-      "provider": "anthropic",
-      "model": "claude-opus-4-20250514",
-      "apiKeys": ["ANTHROPIC_KEY_1", "ANTHROPIC_KEY_2"]
-    }
-  ],
-  "fast": [
-    {
-      "provider": "google",
-      "model": "gemini-2.0-flash-exp",
-      "apiKeys": ["GOOGLE_KEY_1"]
-    }
-  ],
-  "nvidia": [
-    {
-      "provider": "openai-compatible",
-      "baseUrl": "https://integrate.api.nvidia.com/v1",
-      "model": "nvidia/llama-3.1-nemotron-70b-instruct",
-      "apiKeys": ["NVIDIA_KEY_1"]
-    }
-  ],
-  "search": [
-    {
-      "provider": "google",
-      "model": "gemini-3-flash-preview",
-      "apiKeys": ["GOOGLE_KEY_1"],
-      "grounding": true
-    }
-  ]
-}
-'''
-
-# Secrets to set in Cloudflare Dashboard:
+# Secret to set in Cloudflare Dashboard:
 # - PROXY_AUTH_TOKEN
-# - ANTHROPIC_KEY_1, ANTHROPIC_KEY_2
-# - GOOGLE_KEY_1
-# - NVIDIA_KEY_1
-# - OPENAI_KEY_1, GROQ_KEY_1, etc.
+# - ANTHROPIC_KEY_1, GOOGLE_KEY_1, OPENAI_KEY_1, etc.
+
+# ── Seed data (optional) ──────────────────────────────────────────────────
+# After creating the KV namespace, upload your initial config with:
+#
+#   wrangler kv:key put --namespace-id=YOUR_KV_NAMESPACE_ID "routes-config" --path=config.json
+#
+# Or use the Admin API at runtime:
+#   curl -X POST https://ai-proxy.YOUR-USERNAME.workers.dev/v1/admin/routes \
+#     -H "Authorization: Bearer YOUR_PROXY_AUTH_TOKEN" \
+#     -H "Content-Type: application/json" \
+#     -d '{"model":"fast","providers":[{"provider":"google","model":"gemini-2.0-flash","apiKeys":["GOOGLE_KEY_1"]}]}'

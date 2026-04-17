@@ -36,12 +36,13 @@ Your GitHub needs permission to push the code to your Cloudflare account.
 2. Click **Settings** (top tab) -> **Secrets and variables** (left sidebar) -> **Actions**.
 3. Click the green **"New repository secret"** button.
 
-You need to add two secrets here:
+You need to add these secrets:
 
-*   **Secret 1 Name:** `CLOUDFLARE_ACCOUNT_ID`
-    *   *Where to get it:* Log into [Cloudflare Dashboard](https://dash.cloudflare.com). Look at the URL bar. It's the long string of numbers/letters after `dash.cloudflare.com/`. Copy that.
-*   **Secret 2 Name:** `CLOUDFLARE_API_TOKEN`
-    *   *Where to get it:* Go to [Cloudflare API Tokens](https://dash.cloudflare.com/profile/api-tokens). Click **"Create Token"**. Select **"Edit Cloudflare Workers"** template. Click Continue -> Create Token. Copy the secret generated.
+| Secret Name | Where to get it |
+|---|---|
+| `CLOUDFLARE_ACCOUNT_ID` | [Cloudflare Dashboard](https://dash.cloudflare.com) URL — the ID after `dash.cloudflare.com/` |
+| `CLOUDFLARE_API_TOKEN` | [Cloudflare API Tokens](https://dash.cloudflare.com/profile/api-tokens) → Create Token → "Edit Cloudflare Workers" template |
+| `KV_NAMESPACE_ID` | Run `wrangler kv:namespace create "kawai-kv"` and copy the `id` from the output |
 
 ### Step 3: Launch the Action (Deploy)
 1. Go to the **"Actions"** tab at the top of your GitHub repo.
@@ -51,12 +52,13 @@ You need to add two secrets here:
 
 Wait 1-2 minutes. When it turns green, your proxy is live! The URL will look like: `https://ai-proxy.YOUR-USERNAME.workers.dev`
 
-### Step 4: Add Your AI Keys in Cloudflare
-Now you just need to feed it your API keys (OpenAI, Claude, etc).
+### Step 4: Add Your AI Keys & Routes
+Add your API keys in Cloudflare, then add models via the Admin API.
 
+**Add API keys in Cloudflare Dashboard:**
 1. Go to your [Cloudflare Dashboard](https://dash.cloudflare.com).
 2. Click **"Workers & Pages"** on the left sidebar.
-3. Click on your new worker (it should be named `ai-worker-proxy`).
+3. Click on your new worker (named `kawaii`).
 4. Go to the **"Settings"** tab -> **"Variables and Secrets"** (on the left).
 5. Under **Environment Variables**, click **"Add"**. Add these:
 
@@ -67,57 +69,68 @@ Now you just need to feed it your API keys (OpenAI, Claude, etc).
 | `GOOGLE_KEY_1` | `AIza...` | Your Google Gemini API Key |
 | `OPENAI_KEY_1` | `sk-proj-...` | Your OpenAI API Key |
 
-Click **Save and Deploy**. You're done! 🎉
+Click **Save and Deploy**.
+
+**Add models via the Admin API:**
+```bash
+# Add your first model (this writes to Cloudflare KV — no redeploy!)
+curl -X POST https://ai-proxy.YOUR-USERNAME.workers.dev/v1/admin/routes \
+  -H "Authorization: Bearer my-secret-password-123" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "fast",
+    "providers": [
+      { "provider": "google", "model": "gemini-2.0-flash", "apiKeys": ["GOOGLE_KEY_1"] }
+    ]
+  }'
+```
+
+You're done! 🎉
 
 ---
 
-## 🤫 Secret Routing Config (No Code Edits!)
+## 🤫 Dynamic Model Management (No Redeploy!)
 
-You don't need to edit `wrangler.toml` or commit any code to change how your models behave. You can do it stealthily using **GitHub Variables**.
+You don't need to edit `wrangler.toml` or redeploy to add, change, or remove models. Routes are stored in **Cloudflare KV** and can be managed via the **Admin API** at runtime.
 
-This allows you to update your model lists or failover logic without anyone seeing it in your file history.
-
-1. Go to your GitHub Repo -> **Settings** -> **Secrets and variables** -> **Actions**.
-2. Click the **Variables** tab (next to Secrets).
-3. Click **New repository variable**.
-4. Name: `ROUTES_CONFIG`
-5. Value: Paste your JSON configuration here.
-
-**Example `ROUTES_CONFIG` JSON:**
-```json
-{
-  "super-brain": [
-    {
-      "provider": "anthropic",
-      "model": "claude-3-opus-20240229",
-      "apiKeys": ["ANTHROPIC_KEY_1"]
-    },
-    {
-      "provider": "openai",
-      "model": "gpt-4-turbo",
-      "apiKeys": ["OPENAI_KEY_1"]
-    }
-  ],
-  "cheap-fast": [
-    {
-      "provider": "google",
-      "model": "gemini-2.0-flash",
-      "apiKeys": ["GOOGLE_KEY_1"]
-    }
-  ],
-  "search": [
-    {
-      "provider": "google",
-      "model": "gemini-3-flash-preview",
-      "apiKeys": ["GOOGLE_KEY_1"],
-      "grounding": true
-    }
-  ]
-}
+### Add a Model
+```bash
+curl -X POST https://ai-proxy.YOUR-USERNAME.workers.dev/v1/admin/routes \
+  -H "Authorization: Bearer YOUR_PROXY_AUTH_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "super-brain",
+    "providers": [
+      { "provider": "anthropic", "model": "claude-3-opus-20240229", "apiKeys": ["ANTHROPIC_KEY_1"] },
+      { "provider": "openai", "model": "gpt-4-turbo", "apiKeys": ["OPENAI_KEY_1"] }
+    ]
+  }'
 ```
 
-**How to apply changes:**
-After saving the variable, just go to the **Actions** tab and run the **"Deploy to Cloudflare"** workflow again. It will inject your new config automatically.
+### List All Models
+```bash
+curl https://ai-proxy.YOUR-USERNAME.workers.dev/v1/admin/routes \
+  -H "Authorization: Bearer YOUR_PROXY_AUTH_TOKEN"
+```
+
+### Delete a Model
+```bash
+curl -X DELETE "https://ai-proxy.YOUR-USERNAME.workers.dev/v1/admin/routes?model=super-brain" \
+  -H "Authorization: Bearer YOUR_PROXY_AUTH_TOKEN"
+```
+
+### Replace Entire Config
+```bash
+curl -X PUT https://ai-proxy.YOUR-USERNAME.workers.dev/v1/admin/routes \
+  -H "Authorization: Bearer YOUR_PROXY_AUTH_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cheap-fast": [{ "provider": "google", "model": "gemini-2.0-flash", "apiKeys": ["GOOGLE_KEY_1"] }],
+    "search": [{ "provider": "google", "model": "gemini-3-flash-preview", "apiKeys": ["GOOGLE_KEY_1"], "grounding": true }]
+  }'
+```
+
+**Changes take effect instantly** — no redeployment needed. See [KV_SETUP.md](KV_SETUP.md) for the full setup guide.
 
 ---
 
